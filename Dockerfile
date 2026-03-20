@@ -249,8 +249,8 @@ USER node
 #   - aliases: /health and /ready
 # For external access from host/ingress, override bind to "lan" and set auth.
 # Create gateway config for Render deployment
-RUN mkdir -p /data/.openclaw && echo '{"gateway":{"controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true}}}' > /data/.openclaw/openclaw.json
+RUN mkdir -p /app/.openclaw && echo '{"gateway":{"controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true}}}' > /app/.openclaw/openclaw.json
 
 HEALTHCHECK --interval=3m --timeout=10s --start-period=15s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:10000/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured", "--port", "10000", "--bind", "lan"]
+CMD ["sh", "-c", "mkdir -p /data/.openclaw && cp -n /app/.openclaw/openclaw.json /data/.openclaw/openclaw.json 2>/dev/null; exec node openclaw.mjs gateway --allow-unconfigured --port 10000 --bind lan"]
